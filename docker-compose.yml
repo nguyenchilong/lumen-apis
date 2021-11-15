@@ -1,0 +1,87 @@
+version: '3'
+
+networks:
+  backend:
+
+services:
+  nginx:
+    build:
+      context: ./docker
+      dockerfile: nginx.dockerfile
+      args:
+        DOCKER_WORKING_DIR: ${DOCKER_WORKING_DIR}
+        DOCKER_SOURCE_STORAGE_DIR: ${DOCKER_SOURCE_STORAGE_DIR}
+    container_name: web-server
+    ports:
+      - ${DOCKER_NGINX_PORT}:80
+    volumes:
+      - ./:${DOCKER_WORKING_DIR}:delegated
+      - ./storage/logs:/var/log/nginx
+    depends_on:
+      - api
+      - mysql
+    networks:
+      - backend
+  api:
+    build:
+      context: ./docker
+      dockerfile: php.dockerfile
+      args:
+        DOCKER_WORKING_DIR: ${DOCKER_WORKING_DIR}
+        DOCKER_SOURCE_STORAGE_DIR: ${DOCKER_SOURCE_STORAGE_DIR}
+        DOCKER_NGINX_USER: ${DOCKER_NGINX_USER}
+    container_name: api
+    volumes:
+      - ./:${DOCKER_WORKING_DIR}:delegated
+    networks:
+      - backend
+  mysql:
+    image: mysql:5.7.29
+    container_name: mysql
+    restart: unless-stopped
+    tty: true
+    ports:
+      - ${DOCKER_DB_EXPOSE_PORT}:3306
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      SERVICE_TAGS: ${APP_ENV}
+      SERVICE_NAME: mysql
+    networks:
+      - backend
+    volumes:
+      - ./docker/dbdata:/var/lib/mysql
+  composer:
+    build:
+      context: ./docker
+      dockerfile: composer.dockerfile
+      args:
+        DOCKER_WORKING_DIR: ${DOCKER_WORKING_DIR}
+    container_name: composer
+    volumes:
+      - ./:${DOCKER_WORKING_DIR}
+    working_dir: ${DOCKER_WORKING_DIR}
+    depends_on:
+      - api
+    entrypoint: ['composer', '--ignore-platform-reqs']
+    networks:
+      - backend
+  artisan:
+    build:
+      context: ./docker
+      dockerfile: php.dockerfile
+      args:
+        DOCKER_WORKING_DIR: ${DOCKER_WORKING_DIR}
+        DOCKER_SOURCE_STORAGE_DIR: ${DOCKER_SOURCE_STORAGE_DIR}
+        DOCKER_NGINX_USER: ${DOCKER_NGINX_USER}
+    container_name: artisan
+    volumes:
+      - ./:${DOCKER_WORKING_DIR}:delegated
+    depends_on:
+      - mysql
+    working_dir: ${DOCKER_WORKING_DIR}
+    entrypoint: ['php', '${DOCKER_WORKING_DIR}/artisan']
+    networks:
+      - backend

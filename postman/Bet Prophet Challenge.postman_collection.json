@@ -1,0 +1,167 @@
+{
+	"info": {
+		"_postman_id": "c20a5ab4-39b1-444c-883c-99d9724b6520",
+		"name": "Bet Prophet Challenge",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Root API",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}",
+					"host": [
+						"{{base_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Wagers",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}{{version}}/wagers?page=1&limit=10",
+					"host": [
+						"{{base_url}}{{version}}"
+					],
+					"path": [
+						"wagers"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buy Wager By ID",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"buying_price\": \"10.20\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}{{version}}/buy/{{wager_id}}",
+					"host": [
+						"{{base_url}}{{version}}"
+					],
+					"path": [
+						"buy",
+						"{{wager_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Wager",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"total_wager_value\": 50,\n    \"odds\": 1,\n    \"selling_percentage\": 6,\n    \"selling_price\": \"10.99\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}{{version}}/wagers",
+					"host": [
+						"{{base_url}}{{version}}"
+					],
+					"path": [
+						"wagers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Key Hash",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/key",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"key"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
